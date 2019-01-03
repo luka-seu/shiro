@@ -5,7 +5,7 @@
        xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-
+    <import resource="classpath:spring/spring-dao.xml"></import>
     <context:component-scan base-package="com.plasticlove"/>
 
     <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
@@ -16,6 +16,7 @@
             <value>
                 /login.html = anon
                 /subLogin = anon
+                /testRole = roleOr["admin","admin1"]
                 <!--  /testRole = roles["admin"]
                   /testRole1 = roles["admin","admin1"]
                   /testPerms = perms["user:delete"]
@@ -26,12 +27,20 @@
                 /* = authc
             </value>
         </property>
+
+        <property name="filters">
+            <util:map>
+                <entry key="roleOr" value-ref="rolesOrFilter"></entry>
+            </util:map>
+        </property>
         <!--<property name="filters">-->
             <!--<util:map>-->
                 <!--<entry key="rolesOr" value-ref="rolesOrFilter"/>-->
             <!--</util:map>-->
         <!--</property>-->
     </bean>
+
+    <bean id = "rolesOrFilter" class="com.plasticlove.filter.RoleOrFilter"></bean>
 
     <!--<bean id="rolesOrFilter" class="com.plasticlove.filter.RolesOrFilter"/>-->
 

@@ -1,5 +1,9 @@
 package com.plasticlove.shiro.realm;
 
+import com.plasticlove.dao.PermissionMapper;
+import com.plasticlove.dao.RoleMapper;
+import com.plasticlove.dao.UserMapper;
+import com.plasticlove.pojo.User;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -10,18 +14,29 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
+import org.apache.shiro.util.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class CustomeRealm extends AuthorizingRealm {
-    Map<String,String> userMap = new HashMap<String, String>();
-    {
-        userMap.put("luka","11cfde807e348fd131327f264ac7d3bd");
-        super.setName("customerRealm");
-    }
+
+
+
+    @Autowired
+    private UserMapper userMapper;
+    @Autowired
+    private RoleMapper roleMapper;
+    @Autowired
+    private PermissionMapper permissionMapper;
+
+
+
+    // Map<String,String> userMap = new HashMap<String, String>();
+    // {
+    //     userMap.put("luka","11cfde807e348fd131327f264ac7d3bd");
+    //     super.setName("customerRealm");
+    // }
 
 
 
@@ -42,17 +57,22 @@ public class CustomeRealm extends AuthorizingRealm {
 
     private Set<String> getRolesByUsername(String username) {
 
-        Set<String> roleSet = new HashSet<String>();
-        roleSet.add("admin");
-        roleSet.add("user");
+        Set<String> roleSet = roleMapper.selectRoleNameByUsername(username);
+
+        if(CollectionUtils.isEmpty(roleSet)){
+            return  null;
+        }
         return roleSet;
+
     }
 
     private Set<String> getPermissionsByUsername(String username) {
-        Set<String> permissionsSet = new HashSet<String>();
-        permissionsSet.add("user:delete");
-        permissionsSet.add("user:update");
+        Set<String> permissionsSet = permissionMapper.selectPermissionsByUsername(username);
+        if(CollectionUtils.isEmpty(permissionsSet)){
+            return null;
+        }
         return permissionsSet;
+
     }
 
     @Override
@@ -63,13 +83,18 @@ public class CustomeRealm extends AuthorizingRealm {
         if (password==null){
             return null;
         }
-        SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo("luka",password,"customerRealm");
-        authenticationInfo.setCredentialsSalt(ByteSource.Util.bytes("luka"));
+        SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(username,password,"customerRealm");
+        authenticationInfo.setCredentialsSalt(ByteSource.Util.bytes(username));
         return authenticationInfo;
     }
 
     private String getPasswordByUsername(String username) {
-        return userMap.get(username);
+        List<User> users = userMapper.selectUserByUsername(username);
+        if(users==null){
+            return  null;
+        }
+        return  users.get(0).getPassword();
+
     }
 
     // public static void main(String[] args) {

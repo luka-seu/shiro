@@ -11,5 +11,13 @@
 
     <mvc:resources mapping="/*" location="/"/>
 
+    <aop:config proxy-target-class="true"></aop:config>
 
+    <bean class="org.apache.shiro.spring.LifecycleBeanPostProcessor"></bean>
+
+
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+
+        <property name="securityManager" ref="securityManager"></property>
+    </bean>
 </beans>

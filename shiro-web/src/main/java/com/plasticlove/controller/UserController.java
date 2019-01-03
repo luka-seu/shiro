@@ -1,9 +1,11 @@
 package com.plasticlove.controller;
 
-import com.plasticlove.vo.User;
+import com.plasticlove.pojo.User;
+
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.subject.Subject;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,10 +33,29 @@ public class UserController {
             e.printStackTrace();
             return e.getMessage();
         }
+        if(subject.hasRole("admin")){
+            return "有admin权限";
+        }
+
+
+        return "无admin权限";
+    }
 
 
 
-        return "登录成功";
+    // @RequiresPermissions("user:delete")
+    @RequestMapping(value = "/testRole",method = RequestMethod.GET,produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public String testRole(){
+        return "test Role 成功";
+    }
+
+
+    // @RequiresPermissions("user:update")
+    @RequestMapping(value = "/testRole1",method = RequestMethod.GET,produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public String testRole1(){
+        return "test Role1 成功";
     }
 
 
