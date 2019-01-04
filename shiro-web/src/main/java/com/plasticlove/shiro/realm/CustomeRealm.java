@@ -56,6 +56,7 @@ public class CustomeRealm extends AuthorizingRealm {
     }
 
     private Set<String> getRolesByUsername(String username) {
+        System.out.println("从数据库中取！");
 
         Set<String> roleSet = roleMapper.selectRoleNameByUsername(username);
 
